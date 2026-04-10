@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FreshBite - Food Delivery</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+</head>
+<body>
+  <div class="entry-container">
+    <!-- LHS -->
+    <div class="left-section">
+      <div class="hero-content">
+        <h1><i class="fas fa-utensils"></i> FreshBite</h1>
+        <p>Discover delicious food from local providers. Fresh, affordable, and delivered fast!</p>
+        <div class="features">
+          <div class="feature"><i class="fas fa-clock"></i><span>30 min delivery</span></div>
+          <div class="feature"><i class="fas fa-leaf"></i><span>Fresh ingredients</span></div>
+          <div class="feature"><i class="fas fa-rupee-sign"></i><span>Affordable prices</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RHS -->
+    <div class="right-section">
+      <div class="login-card">
+        <div class="logo">
+          <i class="fas fa-utensils"></i>
+          <h2>FreshBite</h2>
+        </div>
+
+        <!-- Step 1: Phone -->
+        <div id="step-phone" class="auth-step active">
+          <h3 class="step-title">Login or Create account</h3>
+          <p class="step-sub">Enter your mobile number to continue</p>
+          <div class="input-group phone-group">
+            <span class="phone-prefix"><img src="https://flagcdn.com/w20/in.png" alt="IN"/> +91</span>
+            <input type="tel" id="phoneInput" placeholder="Mobile number" maxlength="10"/>
+          </div>
+          <p class="terms-note">By continuing, you agree to our <a href="#">Terms of Service</a> & <a href="#">Privacy Policy</a>.</p>
+          <button class="btn-primary" onclick="submitPhone()">Continue</button>
+          <div class="divider"><span>or</span></div>
+          <button class="btn-google" onclick="googleLogin()"><i class="fab fa-google"></i> Continue with Google</button>
+          <p class="login-hint">New to FreshBite? <a href="#" onclick="document.getElementById('step-phone').classList.add('active')">Sign up here</a></p>
+        </div>
+
+        <!-- Step 2: OTP -->
+        <div id="step-otp" class="auth-step">
+          <button class="back-btn" onclick="goBack('step-phone')"><i class="fas fa-arrow-left"></i></button>
+          <h3 class="step-title">OTP Verification</h3>
+          <p class="step-sub">Sent to +91 <span id="displayPhone"></span> <a href="#" onclick="goBack('step-phone')">Change</a></p>
+          <div class="otp-inputs">
+            <input type="text" maxlength="1" class="otp-box" oninput="otpMove(this,1)"/>
+            <input type="text" maxlength="1" class="otp-box" oninput="otpMove(this,2)"/>
+            <input type="text" maxlength="1" class="otp-box" oninput="otpMove(this,3)"/>
+            <input type="text" maxlength="1" class="otp-box" oninput="otpMove(this,4)"/>
+            <input type="text" maxlength="1" class="otp-box" oninput="otpMove(this,5)"/>
+            <input type="text" maxlength="1" class="otp-box" oninput="otpMove(this,6)"/>
+          </div>
+          <p class="resend-note">Didn't receive? <a href="#" onclick="resendOTP()">Resend OTP</a></p>
+          <button class="btn-primary" onclick="verifyOTP()">Verify & Proceed</button>
+        </div>
+
+        <!-- Step 3: Role + Name (new users) -->
+        <div id="step-profile" class="auth-step">
+          <button class="back-btn" onclick="goBack('step-otp')"><i class="fas fa-arrow-left"></i></button>
+          <h3 class="step-title">Complete your profile</h3>
+          <p class="step-sub">Just a few details to get started</p>
+          <div class="input-group"><i class="fas fa-user"></i><input type="text" id="nameInput" placeholder="Full Name"/></div>
+          <div class="input-group"><i class="fas fa-envelope"></i><input type="email" id="emailInput" placeholder="Email (optional)"/></div>
+          <div class="input-group">
+            <i class="fas fa-user-tag"></i>
+            <select id="roleSelect">
+              <option value="">Select Role</option>
+              <option value="buyer">Buyer / Customer</option>
+              <option value="seller">Seller / Food Provider</option>
+            </select>
+          </div>
+          <button class="btn-primary" onclick="completeProfile()">Get Started</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/script.js"></script>
+</body>
+</html>

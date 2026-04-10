@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FreshBite Dashboard</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+</head>
+<body>
+
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-left">
+    <div class="nav-brand"><i class="fas fa-utensils"></i><span>FreshBite</span></div>
+    <div class="nav-location" onclick="navigateTo('address')">
+      <i class="fas fa-map-marker-alt"></i>
+      <span id="navLocation">Set Location</span>
+      <i class="fas fa-chevron-down" style="font-size:10px"></i>
+    </div>
+    <div class="nav-search">
+      <i class="fas fa-search"></i>
+      <input type="text" id="searchInput" placeholder="Search for food, restaurants..." oninput="searchFood()"/>
+    </div>
+  </div>
+  <div class="nav-right">
+    <a class="nav-icon-btn" onclick="navigateTo('wishlist')"><i class="fas fa-heart"></i></a>
+    <a class="nav-icon-btn cart-btn" onclick="navigateTo('cart')">
+      <i class="fas fa-shopping-cart"></i>
+      <span class="badge" id="cartBadge">0</span>
+    </a>
+    <div class="nav-profile-menu">
+      <button class="nav-profile-btn" onclick="toggleProfileMenu()">
+        <div class="avatar" id="navAvatar">U</div>
+        <span id="navName">User</span>
+        <i class="fas fa-chevron-down" style="font-size:10px"></i>
+      </button>
+      <div class="profile-dropdown" id="profileDropdown">
+        <div class="dropdown-header">
+          <div class="avatar lg" id="dropAvatar">U</div>
+          <div><p id="dropName" style="font-weight:600"></p><p id="dropPhone" style="font-size:12px;color:#666"></p></div>
+        </div>
+        <div class="dropdown-divider"></div>
+        <a onclick="navigateTo('profile'); toggleProfileMenu()"><i class="fas fa-user"></i> My Profile</a>
+        <a onclick="navigateTo('orders'); toggleProfileMenu()"><i class="fas fa-shopping-bag"></i> My Orders</a>
+        <a onclick="navigateTo('address'); toggleProfileMenu()"><i class="fas fa-map-marker-alt"></i> Addresses</a>
+        <a onclick="navigateTo('wishlist'); toggleProfileMenu()"><i class="fas fa-heart"></i> Wishlist</a>
+        <a onclick="navigateTo('settings'); toggleProfileMenu()"><i class="fas fa-cog"></i> Settings</a>
+        <div class="dropdown-divider"></div>
+        <a onclick="logout()" class="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main class="main-content">
+
+  <!-- HOME PAGE -->
+  <div id="home" class="page active">
+    <!-- Category bar -->
+    <div class="category-bar">
+      <button class="cat-btn active" onclick="filterCategory('all',this)">All</button>
+      <button class="cat-btn" onclick="filterCategory('breakfast',this)">🌅 Breakfast</button>
+      <button class="cat-btn" onclick="filterCategory('lunch',this)">🍱 Lunch</button>
+      <button class="cat-btn" onclick="filterCategory('snacks',this)">🍟 Snacks</button>
+      <button class="cat-btn" onclick="filterCategory('dinner',this)">🍽️ Dinner</button>
+      <button class="cat-btn" onclick="filterCategory('dessert',this)">🍮 Dessert</button>
+      <button class="cat-btn" onclick="filterCategory('drinks',this)">🥤 Drinks</button>
+    </div>
+
+    <!-- Seller CTA (shown only if seller) -->
+    <div id="sellerBanner" class="seller-banner" style="display:none">
+      <div>
+        <h3>You're a Food Provider</h3>
+        <p>List your food items and start receiving orders!</p>
+      </div>
+      <button class="btn-primary sm" onclick="navigateTo('sell')">Manage Listings</button>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card"><i class="fas fa-utensils"></i><h3 id="statFoods">0</h3><p>Available Foods</p></div>
+      <div class="stat-card"><i class="fas fa-clock"></i><h3>20 min</h3><p>Avg Delivery</p></div>
+      <div class="stat-card"><i class="fas fa-rupee-sign"></i><h3 id="statSaved">₹0</h3><p>Total Saved</p></div>
+      <div class="stat-card"><i class="fas fa-star"></i><h3>4.5★</h3><p>Avg Rating</p></div>
+    </div>
+
+    <!-- Food Grid -->
+    <div class="food-listings">
+      <h2>Today's Fresh Picks</h2>
+      <div class="food-grid" id="foodGrid"></div>
+    </div>
+  </div>
+
+  <!-- PROFILE PAGE -->
+  <div id="profile" class="page">
+    <div class="profile-container">
+      <div class="profile-header">
+        <div class="avatar xl" id="profileAvatar">U</div>
+        <h2 id="profileName">User</h2>
+        <p id="profileRole" class="role-badge buyer">Buyer</p>
+      </div>
+      <div class="profile-info">
+        <div class="info-item"><i class="fas fa-phone"></i><span id="profilePhone">--</span></div>
+        <div class="info-item"><i class="fas fa-envelope"></i><span id="profileEmail">--</span></div>
+      </div>
+      <div class="profile-actions">
+        <button class="btn-primary" onclick="openEditProfile()"><i class="fas fa-edit"></i> Edit Profile</button>
+        <button class="btn-outline danger" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      </div>
+    </div>
+    <!-- Edit Profile Modal trigger -->
+    <div id="editProfileModal" class="modal-overlay" style="display:none">
+      <div class="modal-card">
+        <h3>Edit Profile</h3>
+        <div class="input-group"><i class="fas fa-user"></i><input type="text" id="editName" placeholder="Full Name"/></div>
+        <div class="input-group"><i class="fas fa-envelope"></i><input type="email" id="editEmail" placeholder="Email"/></div>
+        <div class="modal-actions">
+          <button class="btn-outline" onclick="closeEditProfile()">Cancel</button>
+          <button class="btn-primary" onclick="saveProfile()">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORDERS PAGE -->
+  <div id="orders" class="page">
+    <div class="page-header"><h2>My Orders</h2></div>
+    <div id="ordersList" class="orders-list"></div>
+  </div>
+
+  <!-- CART PAGE -->
+  <div id="cart" class="page">
+    <div class="page-header"><h2>Your Cart</h2></div>
+    <div id="cartItems" class="cart-items"></div>
+    <div id="cartSummary" class="cart-summary" style="display:none">
+      <div class="summary-row"><span>Item Total</span><span id="cartSubtotal">₹0</span></div>
+      <div class="summary-row"><span>Delivery Fee</span><span>₹30</span></div>
+      <div class="summary-row total"><span>Total</span><span id="cartTotal">₹30</span></div>
+      <button class="btn-primary" onclick="openCheckout()"><i class="fas fa-credit-card"></i> Proceed to Pay</button>
+    </div>
+  </div>
+
+  <!-- ADDRESS PAGE -->
+  <div id="address" class="page">
+    <div class="page-header">
+      <h2>Saved Addresses</h2>
+      <button class="btn-primary sm" onclick="openAddAddress()"><i class="fas fa-plus"></i> Add New</button>
+    </div>
+    <div id="addressList" class="address-list"></div>
+    <div id="addAddressModal" class="modal-overlay" style="display:none">
+      <div class="modal-card">
+        <h3>Add Address</h3>
+        <div class="addr-type-btns">
+          <button class="addr-type active" onclick="setAddrType('Home',this)"><i class="fas fa-home"></i> Home</button>
+          <button class="addr-type" onclick="setAddrType('Work',this)"><i class="fas fa-briefcase"></i> Work</button>
+          <button class="addr-type" onclick="setAddrType('Other',this)"><i class="fas fa-map-pin"></i> Other</button>
+        </div>
+        <div class="input-group"><i class="fas fa-map-marker-alt"></i><input type="text" id="addrLine1" placeholder="House/Flat/Block No."/></div>
+        <div class="input-group"><i class="fas fa-road"></i><input type="text" id="addrLine2" placeholder="Street, Area"/></div>
+        <div class="input-group"><i class="fas fa-city"></i><input type="text" id="addrCity" placeholder="City"/></div>
+        <div class="modal-actions">
+          <button class="btn-outline" onclick="closeAddAddress()">Cancel</button>
+          <button class="btn-primary" onclick="saveAddress()">Save Address</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WISHLIST PAGE -->
+  <div id="wishlist" class="page">
+    <div class="page-header"><h2>My Wishlist</h2></div>
+    <div id="wishlistGrid" class="food-grid"></div>
+  </div>
+
+  <!-- SETTINGS PAGE -->
+  <div id="settings" class="page">
+    <div class="page-header"><h2>Settings</h2></div>
+    <div class="settings-list">
+      <div class="settings-item">
+        <div><p class="s-label">Notifications</p><p class="s-sub">Order updates, offers</p></div>
+        <label class="toggle"><input type="checkbox" id="notifToggle" checked/><span class="slider"></span></label>
+      </div>
+      <div class="settings-item">
+        <div><p class="s-label">Dark Mode</p><p class="s-sub">Switch appearance</p></div>
+        <label class="toggle"><input type="checkbox" id="darkToggle" onchange="toggleDark()"/><span class="slider"></span></label>
+      </div>
+      <div class="settings-item">
+        <div><p class="s-label">Language</p><p class="s-sub">English</p></div>
+        <i class="fas fa-chevron-right"></i>
+      </div>
+      <div class="settings-item" onclick="logout()" style="cursor:pointer">
+        <div><p class="s-label" style="color:#e74c3c">Logout</p><p class="s-sub">Sign out of FreshBite</p></div>
+        <i class="fas fa-sign-out-alt" style="color:#e74c3c"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- SELLER DASHBOARD PAGE -->
+  <div id="sell" class="page">
+    <div class="page-header">
+      <h2>My Food Listings</h2>
+      <button class="btn-primary sm" onclick="openAddFood()"><i class="fas fa-plus"></i> Add Food</button>
+    </div>
+    <div id="sellerFoodGrid" class="food-grid"></div>
+
+    <div id="addFoodModal" class="modal-overlay" style="display:none">
+      <div class="modal-card wide">
+        <h3 id="addFoodTitle">Add Food Listing</h3>
+        <div class="two-col">
+          <div class="input-group"><i class="fas fa-utensils"></i><input type="text" id="foodName" placeholder="Food Name"/></div>
+          <div class="input-group"><i class="fas fa-rupee-sign"></i><input type="number" id="foodPrice" placeholder="Price (₹)"/></div>
+          <div class="input-group"><i class="fas fa-tag"></i>
+            <select id="foodCategory">
+              <option value="breakfast">Breakfast</option>
+              <option value="lunch">Lunch</option>
+              <option value="snacks">Snacks</option>
+              <option value="dinner">Dinner</option>
+              <option value="dessert">Dessert</option>
+              <option value="drinks">Drinks</option>
+            </select>
+          </div>
+          <div class="input-group"><i class="fas fa-calendar-alt"></i><input type="date" id="foodExpiry" placeholder="Expiry Date"/></div>
+        </div>
+        <div class="input-group"><i class="fas fa-leaf"></i><input type="text" id="foodIngredients" placeholder="Ingredients (comma separated)"/></div>
+        <div class="input-group"><i class="fas fa-align-left"></i><textarea id="foodDesc" placeholder="Description" rows="3" style="padding:1rem 1rem 1rem 3rem;border:2px solid #e9ecef;border-radius:12px;width:100%;font-size:1rem;resize:vertical;"></textarea></div>
+        <div class="input-group"><i class="fas fa-image"></i><input type="url" id="foodImg" placeholder="Image URL (optional)"/></div>
+        <div class="modal-actions">
+          <button class="btn-outline" onclick="closeAddFood()">Cancel</button>
+          <button class="btn-primary" onclick="saveFood()">List Food</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- FOOD DETAIL MODAL -->
+<div id="foodDetailModal" class="modal-overlay" style="display:none">
+  <div class="modal-card wide food-detail-card">
+    <button class="modal-close" onclick="closeFoodDetail()"><i class="fas fa-times"></i></button>
+    <img id="fdImg" src="" alt="" class="fd-img"/>
+    <div class="fd-body">
+      <div class="fd-top">
+        <h2 id="fdName"></h2>
+        <span class="fd-price" id="fdPrice"></span>
+      </div>
+      <p id="fdDesc" class="fd-desc"></p>
+      <div class="fd-meta-grid">
+        <div class="fd-meta-item"><i class="fas fa-leaf"></i><div><span class="fd-meta-label">Ingredients</span><span id="fdIngredients" class="fd-meta-val"></span></div></div>
+        <div class="fd-meta-item"><i class="fas fa-calendar-times"></i><div><span class="fd-meta-label">Expiry Date</span><span id="fdExpiry" class="fd-meta-val"></span></div></div>
+        <div class="fd-meta-item"><i class="fas fa-clock"></i><div><span class="fd-meta-label">Listed On</span><span id="fdListed" class="fd-meta-val"></span></div></div>
+        <div class="fd-meta-item"><i class="fas fa-store"></i><div><span class="fd-meta-label">Provider</span><span id="fdSeller" class="fd-meta-val"></span></div></div>
+        <div class="fd-meta-item"><i class="fas fa-tag"></i><div><span class="fd-meta-label">Category</span><span id="fdCategory" class="fd-meta-val"></span></div></div>
+        <div class="fd-meta-item"><i class="fas fa-star"></i><div><span class="fd-meta-label">Rating</span><span id="fdRating" class="fd-meta-val"></span></div></div>
+      </div>
+      <div class="fd-actions">
+        <button class="btn-wish" id="fdWishBtn" onclick="toggleWishFromDetail()"><i class="fas fa-heart"></i> Wishlist</button>
+        <div class="qty-control" id="fdQtyControl">
+          <button onclick="fdChangeQty(-1)">−</button>
+          <span id="fdQty">1</span>
+          <button onclick="fdChangeQty(1)">+</button>
+        </div>
+        <button class="btn-primary" onclick="addToCartFromDetail()"><i class="fas fa-cart-plus"></i> Add to Cart</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHECKOUT / PAYMENT MODAL -->
+<div id="checkoutModal" class="modal-overlay" style="display:none">
+  <div class="modal-card wide">
+    <button class="modal-close" onclick="closeCheckout()"><i class="fas fa-times"></i></button>
+    <h3>Checkout</h3>
+
+    <!-- Address Selection -->
+    <div class="checkout-section">
+      <h4><i class="fas fa-map-marker-alt"></i> Delivery Address</h4>
+      <div id="checkoutAddress" class="checkout-addr-list"></div>
+    </div>
+
+    <!-- Payment Method -->
+    <div class="checkout-section">
+      <h4><i class="fas fa-credit-card"></i> Payment Method</h4>
+      <div class="payment-methods">
+        <label class="pay-option active" onclick="selectPayMethod('cod', this)">
+          <input type="radio" name="payMethod" value="cod" checked/>
+          <i class="fas fa-money-bill-wave"></i>
+          <div><p>Cash on Delivery</p><small>Pay when food arrives</small></div>
+        </label>
+        <label class="pay-option" onclick="selectPayMethod('upi', this)">
+          <input type="radio" name="payMethod" value="upi"/>
+          <i class="fas fa-mobile-alt"></i>
+          <div><p>UPI</p><small>PhonePe, GPay, Paytm</small></div>
+        </label>
+        <label class="pay-option" onclick="selectPayMethod('netbanking', this)">
+          <input type="radio" name="payMethod" value="netbanking"/>
+          <i class="fas fa-university"></i>
+          <div><p>Net Banking</p><small>All major banks</small></div>
+        </label>
+        <label class="pay-option" onclick="selectPayMethod('card', this)">
+          <input type="radio" name="payMethod" value="card"/>
+          <i class="fas fa-credit-card"></i>
+          <div><p>Credit / Debit Card</p><small>Visa, Mastercard, RuPay</small></div>
+        </label>
+      </div>
+
+      <!-- UPI Input -->
+      <div id="upiSection" class="pay-detail-section" style="display:none">
+        <div class="upi-options">
+          <button class="upi-app-btn active" onclick="selectUPIApp('gpay',this)"><img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" alt="GPay"/>Google Pay</button>
+          <button class="upi-app-btn" onclick="selectUPIApp('phonepe',this)"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/PhonePe_Logo.png/220px-PhonePe_Logo.png" alt="PhonePe"/>PhonePe</button>
+          <button class="upi-app-btn" onclick="selectUPIApp('paytm',this)"><img src="https://upload.wikimedia.org/wikipedia/commons/4/42/Paytm_logo.png" alt="Paytm"/>Paytm</button>
+        </div>
+        <div class="input-group" style="margin-top:1rem"><i class="fas fa-at"></i><input type="text" id="upiId" placeholder="Enter UPI ID (e.g. name@upi)"/></div>
+        <div class="qr-section">
+          <p style="text-align:center;color:#666;margin:1rem 0 0.5rem">— or scan QR —</p>
+          <div class="qr-placeholder"><i class="fas fa-qrcode" style="font-size:60px;color:#ccc"></i><p>QR Code</p></div>
+        </div>
+      </div>
+
+      <!-- Net Banking -->
+      <div id="netbankingSection" class="pay-detail-section" style="display:none">
+        <div class="input-group"><i class="fas fa-university"></i>
+          <select id="bankSelect">
+            <option value="">Select Bank</option>
+            <option>State Bank of India</option>
+            <option>HDFC Bank</option>
+            <option>ICICI Bank</option>
+            <option>Axis Bank</option>
+            <option>Punjab National Bank</option>
+            <option>Bank of Baroda</option>
+            <option>Kotak Mahindra Bank</option>
+            <option>IndusInd Bank</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Card -->
+      <div id="cardSection" class="pay-detail-section" style="display:none">
+        <div class="input-group"><i class="fas fa-credit-card"></i><input type="text" id="cardNum" placeholder="Card Number" maxlength="19" oninput="formatCard(this)"/></div>
+        <div class="two-col" style="gap:1rem">
+          <div class="input-group"><i class="fas fa-calendar"></i><input type="text" id="cardExp" placeholder="MM/YY" maxlength="5"/></div>
+          <div class="input-group"><i class="fas fa-lock"></i><input type="password" id="cardCVV" placeholder="CVV" maxlength="3"/></div>
+        </div>
+        <div class="input-group"><i class="fas fa-user"></i><input type="text" id="cardName" placeholder="Name on Card"/></div>
+      </div>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="checkout-section">
+      <h4><i class="fas fa-receipt"></i> Order Summary</h4>
+      <div id="checkoutSummaryItems"></div>
+      <div class="summary-row"><span>Item Total</span><span id="coSubtotal">₹0</span></div>
+      <div class="summary-row"><span>Delivery Fee</span><span>₹30</span></div>
+      <div class="summary-row total"><span>Grand Total</span><span id="coTotal">₹30</span></div>
+    </div>
+
+    <button class="btn-primary" style="margin-top:1rem" onclick="placeOrder()"><i class="fas fa-check-circle"></i> Place Order</button>
+  </div>
+</div>
+
+<!-- ORDER SUCCESS MODAL -->
+<div id="orderSuccessModal" class="modal-overlay" style="display:none">
+  <div class="modal-card success-card">
+    <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+    <h3>Order Placed!</h3>
+    <p id="successMsg">Your order has been placed successfully.</p>
+    <p class="eta-text"><i class="fas fa-clock"></i> Estimated delivery: <strong>25–35 min</strong></p>
+    <button class="btn-primary" onclick="closeSuccess()">Track Order</button>
+  </div>
+</div>
+
+<script src="js/script.js"></script>
+</body>
+</html>
